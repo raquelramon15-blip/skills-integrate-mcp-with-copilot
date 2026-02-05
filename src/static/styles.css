@@ -24,8 +24,180 @@ header {
   border-radius: 5px;
 }
 
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.header-title {
+  flex-grow: 1;
+  text-align: center;
+}
+
 header h1 {
   margin-bottom: 10px;
+}
+
+.user-icon {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 5px;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+.user-icon:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Modal Styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 400px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #1a237e;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #999;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+#login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-btn {
+  margin-top: 15px;
+  padding: 12px;
+  font-size: 16px;
+}
+
+/* Admin Panel Styles */
+.admin-panel {
+  background-color: #fff3e0;
+  border-left: 4px solid #ff9800;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+
+.admin-panel.hidden {
+  display: none;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.admin-header h3 {
+  margin: 0;
+  color: #e65100;
+}
+
+.admin-header p {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.logout-btn {
+  background-color: #d32f2f;
+  padding: 8px 15px;
+  font-size: 14px;
+}
+
+.logout-btn:hover {
+  background-color: #c62828;
+}
+
+.admin-content {
+  color: #666;
+  font-size: 14px;
+}
+
+/* Admin Registration in Activity Cards */
+.admin-register {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed #ccc;
+}
+
+.admin-email {
+  flex-grow: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.register-btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.register-btn:hover {
+  background-color: #45a049;
 }
 
 main {
@@ -198,3 +370,4 @@ footer {
   padding: 20px;
   color: #666;
 }
+

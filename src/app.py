@@ -10,6 +10,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 import os
 from pathlib import Path
+import json
+
+# Track logged-in teachers
+logged_in_teachers = {}
 
 app = FastAPI(title="Mergington High School API",
               description="API for viewing and signing up for extracurricular activities")
@@ -18,6 +22,16 @@ app = FastAPI(title="Mergington High School API",
 current_dir = Path(__file__).parent
 app.mount("/static", StaticFiles(directory=os.path.join(Path(__file__).parent,
           "static")), name="static")
+
+# Load teachers from JSON file
+def load_teachers():
+    teachers_file = Path(__file__).parent / "teachers.json"
+    if teachers_file.exists():
+        with open(teachers_file, 'r') as f:
+            return json.load(f).get("teachers", [])
+    return []
+
+teachers = load_teachers()
 
 # In-memory activity database
 activities = {
@@ -130,3 +144,88 @@ def unregister_from_activity(activity_name: str, email: str):
     # Remove student
     activity["participants"].remove(email)
     return {"message": f"Unregistered {email} from {activity_name}"}
+
+
+@app.post("/login")
+def login(username: str, password: str):
+    """Authenticate a teacher"""
+    # Validate credentials
+    for teacher in teachers:
+        if teacher["username"] == username and teacher["password"] == password:
+            logged_in_teachers[username] = True
+            return {"message": f"Welcome back, {username}!", "username": username}
+    
+    raise HTTPException(status_code=401, detail="Invalid username or password")
+
+
+@app.post("/logout")
+def logout(username: str):
+    """Logout a teacher"""
+    if username in logged_in_teachers:
+        del logged_in_teachers[username]
+    return {"message": f"Goodbye, {username}!"}
+
+
+@app.get("/check-auth")
+def check_auth(username: str):
+    """Check if a teacher is logged in"""
+    return {"authenticated": username in logged_in_teachers}
+
+
+@app.post("/activities/{activity_name}/signup-admin")
+def signup_for_activity_admin(activity_name: str, email: str, admin_username: str):
+    """Sign up a student for an activity (admin only)"""
+    # Check admin authorization
+    if admin_username not in logged_in_teachers:
+        raise HTTPException(status_code=403, detail="Unauthorized. Teachers only.")
+    
+    # Validate activity exists
+    if activity_name not in activities:
+        raise HTTPException(status_code=404, detail="Activity not found")
+
+    # Get the specific activity
+    activity = activities[activity_name]
+
+    # Check capacity
+    if len(activity["participants"]) >= activity["max_participants"]:
+        raise HTTPException(
+            status_code=400,
+            detail="Activity is at maximum capacity"
+        )
+
+    # Validate student is not already signed up
+    if email in activity["participants"]:
+        raise HTTPException(
+            status_code=400,
+            detail="Student is already signed up"
+        )
+
+    # Add student
+    activity["participants"].append(email)
+    return {"message": f"Admin {admin_username} signed up {email} for {activity_name}"}
+
+
+@app.delete("/activities/{activity_name}/unregister-admin")
+def unregister_from_activity_admin(activity_name: str, email: str, admin_username: str):
+    """Unregister a student from an activity (admin only)"""
+    # Check admin authorization
+    if admin_username not in logged_in_teachers:
+        raise HTTPException(status_code=403, detail="Unauthorized. Teachers only.")
+    
+    # Validate activity exists
+    if activity_name not in activities:
+        raise HTTPException(status_code=404, detail="Activity not found")
+
+    # Get the specific activity
+    activity = activities[activity_name]
+
+    # Validate student is signed up
+    if email not in activity["participants"]:
+        raise HTTPException(
+            status_code=400,
+            detail="Student is not signed up for this activity"
+        )
+
+    # Remove student
+    activity["participants"].remove(email)
+    return {"message": f"Admin {admin_username} unregistered {email} from {activity_name}"}
